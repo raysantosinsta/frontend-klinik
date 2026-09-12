@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/components/AuthProvider';
 
 export default function NewServicePage() {
   const router = useRouter();
@@ -10,14 +11,16 @@ export default function NewServicePage() {
     description: '',
     durationInMinutes: 30,
     price: 0,
-    businessId: 'f47ac10b-58cc-4372-a567-0e02b2c3d479', // uuid genérico provisório p/ MVP
   });
+  const { businessId, isLoading: isAuthLoading } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!businessId) return;
+    
     setLoading(true);
     setError('');
     setSuccess(false);
@@ -32,6 +35,7 @@ export default function NewServicePage() {
           ...formData,
           durationInMinutes: Number(formData.durationInMinutes),
           price: Number(formData.price),
+          businessId,
         }),
       });
 
@@ -118,7 +122,7 @@ export default function NewServicePage() {
 
         <button 
           type="submit" 
-          disabled={loading}
+          disabled={loading || !businessId || isAuthLoading}
           className="bg-blue-600 text-white font-medium px-4 py-2 rounded hover:bg-blue-700 w-full disabled:opacity-50 transition-colors"
         >
           {loading ? 'Salvando...' : 'Salvar Serviço'}

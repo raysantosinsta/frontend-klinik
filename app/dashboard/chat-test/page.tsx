@@ -1,17 +1,17 @@
 "use client";
 
 import { useState } from 'react';
+import { useAuth } from '@/components/AuthProvider';
 
 export default function ChatTestPage() {
   const [message, setMessage] = useState('');
   const [history, setHistory] = useState<{ role: 'user' | 'assistant'; content: string }[]>([]);
   const [loading, setLoading] = useState(false);
 
-  // ID do negócio que usamos para subir o PDF do Complexo BemStar
-  const businessId = "f47ac10b-58cc-4372-a567-0e02b2c3d479"; 
+  const { businessId, isLoading: isAuthLoading } = useAuth();
 
   const sendMessage = async () => {
-    if (!message.trim()) return;
+    if (!message.trim() || !businessId) return;
 
     const userMessage = message;
     setHistory(prev => [...prev, { role: 'user', content: userMessage }]);
@@ -95,7 +95,8 @@ export default function ChatTestPage() {
           />
           <button 
             onClick={sendMessage} 
-            className="bg-[#128C7E] hover:bg-[#075E54] text-white w-12 h-12 rounded-full flex items-center justify-center transition-colors shadow-md"
+            disabled={!businessId || isAuthLoading}
+            className="bg-[#128C7E] hover:bg-[#075E54] text-white w-12 h-12 rounded-full flex items-center justify-center transition-colors shadow-md disabled:opacity-50"
           >
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5 ml-1">
               <path strokeLinecap="round" strokeLinejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />

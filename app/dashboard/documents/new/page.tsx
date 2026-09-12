@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/components/AuthProvider';
 
 export default function NewDocumentPage() {
   const router = useRouter();
@@ -10,9 +11,11 @@ export default function NewDocumentPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState(false);
 
+  const { businessId, isLoading: isAuthLoading } = useAuth();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!file) return;
+    if (!file || !businessId) return;
 
     setLoading(true);
     setError('');
@@ -20,8 +23,7 @@ export default function NewDocumentPage() {
 
     const formData = new FormData();
     formData.append('file', file);
-    // UUID mockado do Business que inserimos anteriormente no banco
-    formData.append('businessId', 'f47ac10b-58cc-4372-a567-0e02b2c3d479');
+    formData.append('businessId', businessId);
 
     try {
       const response = await fetch('http://localhost:3001/documents/upload', {
@@ -71,7 +73,7 @@ export default function NewDocumentPage() {
 
         <button 
           type="submit" 
-          disabled={loading || !file}
+          disabled={loading || !file || !businessId || isAuthLoading}
           className="bg-blue-600 text-white font-medium px-4 py-2 rounded hover:bg-blue-700 w-full disabled:opacity-50 transition-colors"
         >
           {loading ? 'Enviando...' : 'Fazer Upload'}

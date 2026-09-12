@@ -56,6 +56,23 @@ export default function DashboardPage() {
           <p className="eyebrow">Sessão ativa</p>
           <h2>{user?.email}</h2>
           <p>O próximo passo é conectar seus serviços e começar a organizar seus agendamentos.</p>
+          
+          <div style={{ marginTop: '20px', display: 'flex', gap: '10px' }}>
+            <button 
+              onClick={() => router.push('/dashboard/whatsapp')}
+              style={{
+                background: 'var(--accent)',
+                color: 'white',
+                padding: '8px 16px',
+                borderRadius: '6px',
+                border: 'none',
+                cursor: 'pointer',
+                fontWeight: 600
+              }}
+            >
+              Conectar WhatsApp
+            </button>
+          </div>
         </div>
       </section>
     </main>
