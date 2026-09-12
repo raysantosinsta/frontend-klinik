@@ -1,4 +1,19 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+## Configuração local
+
+Crie um arquivo `.env.local` com as credenciais públicas do seu projeto Supabase:
+
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://seu-projeto.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=sua-chave-anon
+```
+
+No painel do Supabase, habilite o provedor **Email** em Authentication e crie um usuário em Authentication > Users. Depois, inicie o frontend:
+
+```bash
+npm run dev
+```
+
+O login fica disponível em `http://localhost:3000` e o painel protegido em `/dashboard`.
 
 ## Getting Started
 
