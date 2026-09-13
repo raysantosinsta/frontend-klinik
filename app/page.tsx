@@ -40,7 +40,7 @@ export default function Home() {
 
       // 2. Criar a clínica e vincular ao usuário no Backend
       try {
-        const res = await fetch("http://localhost:3001/users/register", {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/register`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({

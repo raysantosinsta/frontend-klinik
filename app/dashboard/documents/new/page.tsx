@@ -26,7 +26,7 @@ export default function NewDocumentPage() {
     formData.append('businessId', businessId);
 
     try {
-      const response = await fetch('http://localhost:3001/documents/upload', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/documents/upload`, {
         method: 'POST',
         body: formData,
       });

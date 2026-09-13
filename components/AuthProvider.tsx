@@ -34,7 +34,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         
         // Fetch businessId from backend
         try {
-          const res = await fetch(`http://localhost:3001/users/me/${session.user.id}`);
+          const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/me/${session.user.id}`);
           if (res.ok) {
             const profile = await res.json();
             setBusinessId(profile.businessId);
@@ -58,7 +58,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (session?.user) {
         setUser(session.user);
         try {
-          const res = await fetch(`http://localhost:3001/users/me/${session.user.id}`);
+          const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/me/${session.user.id}`);
           if (res.ok) {
             const profile = await res.json();
             setBusinessId(profile.businessId);

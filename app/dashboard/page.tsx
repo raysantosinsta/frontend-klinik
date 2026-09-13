@@ -38,7 +38,7 @@ export default function DashboardPage() {
   useEffect(() => {
     if (!businessId) return;
     
-    fetch(`http://localhost:3001/business/${businessId}`)
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/business/${businessId}`)
       .then(res => res.json())
       .then(data => {
         if (data.ownerPhone) {
@@ -53,7 +53,7 @@ export default function DashboardPage() {
     
     setSavingPhone(true);
     try {
-      const res = await fetch(`http://localhost:3001/business/${businessId}/ownerPhone`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/business/${businessId}/ownerPhone`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ ownerPhone }),

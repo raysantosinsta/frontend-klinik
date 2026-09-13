@@ -26,7 +26,7 @@ export default function NewServicePage() {
     setSuccess(false);
 
     try {
-      const response = await fetch('http://localhost:3001/services', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/services`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -24,7 +24,7 @@ export default function AppointmentsPage() {
   useEffect(() => {
     if (!businessId) return;
 
-    fetch(`http://localhost:3001/appointments/${businessId}`)
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/appointments/${businessId}`)
       .then((res) => res.json())
       .then((data) => {
         setAppointments(data);
@@ -38,7 +38,7 @@ export default function AppointmentsPage() {
 
   const changeStatus = async (id: string, newStatus: string) => {
     try {
-      const res = await fetch(`http://localhost:3001/appointments/${id}/status`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/appointments/${id}/status`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status: newStatus })

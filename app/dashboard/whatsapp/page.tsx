@@ -16,7 +16,7 @@ export default function WhatsAppSettingsPage() {
     if (!businessId) return;
     try {
       setIsLoading(true);
-      const res = await fetch(`http://localhost:3001/whatsapp/status/${businessId}`);
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/whatsapp/status/${businessId}`);
       if (res.ok) {
         const data = await res.json();
         setIsConnected(data.connected);
@@ -45,7 +45,7 @@ export default function WhatsAppSettingsPage() {
   const handleConnect = async () => {
     try {
       setIsLoading(true);
-      const res = await fetch(`http://localhost:3001/whatsapp/connect/${businessId}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/whatsapp/connect/${businessId}`, {
         method: 'POST',
       });
       if (res.ok) {
@@ -73,7 +73,7 @@ export default function WhatsAppSettingsPage() {
 
     try {
       setIsLoading(true);
-      const res = await fetch(`http://localhost:3001/whatsapp/disconnect/${businessId}`, {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/whatsapp/disconnect/${businessId}`, {
         method: 'DELETE',
       });
       if (res.ok) {
