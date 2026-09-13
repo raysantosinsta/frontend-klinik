@@ -63,7 +63,7 @@ export default function SalesLandingPage() {
           <Link href="/auth" className="hidden md:block text-xs uppercase tracking-widest font-semibold hover:opacity-70 transition-opacity text-[#1A1A1A]">
             Login
           </Link>
-          <Link href="#demonstracao" className="bg-[#1A1A1A] text-white px-5 py-2.5 rounded-sm text-xs uppercase tracking-widest font-semibold hover:bg-black transition-colors shadow-lg">
+          <Link href="https://wa.me/5585984372865" target="_blank" rel="noopener noreferrer" className="bg-[#1A1A1A] text-white px-5 py-2.5 rounded-sm text-xs uppercase tracking-widest font-semibold hover:bg-black transition-colors shadow-lg">
             Ver Demonstração
           </Link>
         </div>
@@ -88,10 +88,10 @@ export default function SalesLandingPage() {
             Atenda seus clientes 24h por dia, responda dúvidas automaticamente e transforme conversas em agendamentos — mesmo quando sua equipe está ocupada ou fora do horário comercial.
           </motion.p>
           <motion.div variants={fadeUpVariant} className="flex flex-col sm:flex-row gap-4 pt-4">
-            <Link href="#demonstracao" className="bg-[#1A1A1A] text-white px-8 py-4 rounded-sm text-sm uppercase tracking-widest font-bold hover:bg-black transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1 text-center flex items-center justify-center gap-2">
+            <Link href="https://wa.me/5585984372865" target="_blank" rel="noopener noreferrer" className="bg-[#1A1A1A] text-white px-8 py-4 rounded-sm text-sm uppercase tracking-widest font-bold hover:bg-black transition-all shadow-xl hover:shadow-2xl hover:-translate-y-1 text-center flex items-center justify-center gap-2">
               Quero ver como funciona <ArrowRight className="w-4 h-4" />
             </Link>
-            <Link href="#demonstracao" className="bg-white text-[#1A1A1A] border border-gray-200 px-8 py-4 rounded-sm text-sm uppercase tracking-widest font-bold hover:bg-gray-50 transition-all text-center flex items-center justify-center">
+            <Link href="https://wa.me/5585984372865" target="_blank" rel="noopener noreferrer" className="bg-white text-[#1A1A1A] border border-gray-200 px-8 py-4 rounded-sm text-sm uppercase tracking-widest font-bold hover:bg-gray-50 transition-all text-center flex items-center justify-center">
               Ver demonstração
             </Link>
           </motion.div>
@@ -426,10 +426,10 @@ export default function SalesLandingPage() {
           
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
             {[
-              { nome: "Clínicas de Estética", img: "/images/clinic_reception.jpg" },
-              { nome: "Consultórios Odontológicos", img: "/images/doctor_patient.jpg" },
-              { nome: "Barbearias de Alto Padrão", img: "/images/smartphone_desk.jpg" }, 
-              { nome: "Salões de Beleza", img: "/images/minimalist_waiting.jpg" } 
+              { nome: "Clínicas de Estética", img: "/images/aesthetic_clinic.jpg" },
+              { nome: "Consultórios Odontológicos", img: "/images/dentist_clinic.jpg" },
+              { nome: "Barbearias de Alto Padrão", img: "/images/premium_barbershop.jpg" }, 
+              { nome: "Salões de Beleza", img: "/images/beauty_salon.jpg" } 
             ].map((negocio, idx) => (
               <motion.div 
                 key={idx}
@@ -464,7 +464,7 @@ export default function SalesLandingPage() {
           <p className="text-xl text-gray-400 font-light mb-12 max-w-2xl">
             Veja como o atendimento automático pode funcionar no seu negócio e descubra quanto tempo e dinheiro você pode recuperar.
           </p>
-          <Link href="/auth" className="bg-white text-[#1A1A1A] px-12 py-5 rounded-sm text-sm uppercase tracking-widest font-bold hover:bg-gray-200 transition-colors shadow-2xl hover:scale-105 transform duration-200 flex items-center gap-3">
+          <Link href="https://wa.me/5585984372865" target="_blank" rel="noopener noreferrer" className="bg-white text-[#1A1A1A] px-12 py-5 rounded-sm text-sm uppercase tracking-widest font-bold hover:bg-gray-200 transition-colors shadow-2xl hover:scale-105 transform duration-200 flex items-center gap-3">
             Quero ver uma demonstração <ArrowRight className="w-5 h-5"/>
           </Link>
         </motion.div>
