@@ -6,7 +6,7 @@ import { useAuth } from '@/components/AuthProvider';
 
 export default function WhatsAppSettingsPage() {
   const { businessId, isLoading: isAuthLoading } = useAuth();
-  
+
   const [status, setStatus] = useState<string>('Carregando...');
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [qrCode, setQrCode] = useState<string | null>(null);
@@ -55,10 +55,14 @@ export default function WhatsAppSettingsPage() {
           setQrCode(data.qrcode.startsWith('data:') ? data.qrcode : `data:image/png;base64,${data.qrcode}`);
           setStatus('Aguardando leitura do QR Code');
         }
+      } else {
+        const errorText = await res.text();
+        console.error('Backend error:', errorText);
+        alert(`Erro retornado pelo servidor: ${res.status}. Verifique o terminal do backend.`);
       }
     } catch (err) {
       console.error(err);
-      alert('Erro ao tentar conectar.');
+      alert('Erro ao tentar conectar com o servidor.');
     } finally {
       setIsLoading(false);
     }
@@ -66,7 +70,7 @@ export default function WhatsAppSettingsPage() {
 
   const handleDisconnect = async () => {
     if (!confirm('Tem certeza que deseja desconectar este número de WhatsApp?')) return;
-    
+
     try {
       setIsLoading(true);
       const res = await fetch(`http://localhost:3001/whatsapp/disconnect/${businessId}`, {
@@ -137,10 +141,10 @@ export default function WhatsAppSettingsPage() {
               <li>Aponte a câmera para a imagem abaixo</li>
             </ol>
             <div className="relative w-64 h-64 bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
-              <Image 
-                src={qrCode} 
-                alt="QR Code do WhatsApp" 
-                fill 
+              <Image
+                src={qrCode}
+                alt="QR Code do WhatsApp"
+                fill
                 className="object-contain p-2"
                 unoptimized
               />
