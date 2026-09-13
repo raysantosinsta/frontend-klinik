@@ -14,16 +14,14 @@ export default function NewServicePage() {
   });
   const { businessId, isLoading: isAuthLoading } = useAuth();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [success, setSuccess] = useState(false);
+  const [statusMessage, setStatusMessage] = useState<{type: "success" | "error" | "", text: string}>({ type: "", text: "" });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!businessId) return;
     
     setLoading(true);
-    setError('');
-    setSuccess(false);
+    setStatusMessage({ type: "", text: "" });
 
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/services`, {
@@ -40,15 +38,15 @@ export default function NewServicePage() {
       });
 
       if (!response.ok) {
-        throw new Error('Falha ao criar o serviço na API.');
+        throw new Error('O servidor rejeitou os parâmetros do serviço.');
       }
 
-      setSuccess(true);
+      setStatusMessage({ type: "success", text: "Serviço indexado no catálogo." });
       setTimeout(() => {
         router.push('/dashboard');
-      }, 2000);
+      }, 1500);
     } catch (err: any) {
-      setError(err.message);
+      setStatusMessage({ type: "error", text: err.message || "Falha ao registrar o serviço." });
     } finally {
       setLoading(false);
     }
@@ -60,74 +58,88 @@ export default function NewServicePage() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md mt-10 text-gray-800">
-      <h1 className="text-2xl font-bold mb-6 text-gray-900">Cadastrar Novo Serviço</h1>
-      
-      {error && <div className="bg-red-100 text-red-700 p-3 rounded mb-4">{error}</div>}
-      {success && <div className="bg-green-100 text-green-700 p-3 rounded mb-4">Serviço criado com sucesso! Redirecionando...</div>}
+    <div className="flex flex-col max-w-2xl gap-8">
+      <header>
+        <h1 className="text-3xl font-semibold tracking-tight text-klinik-text mb-2">
+          Adicionar Serviço
+        </h1>
+        <p className="text-klinik-muted text-lg leading-relaxed">
+          Registre um novo procedimento no catálogo. A IA utilizará estas informações para ofertar horários precisos.
+        </p>
+      </header>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Nome do Serviço</label>
-          <input 
-            type="text" 
-            name="name"
-            required
-            value={formData.name}
-            onChange={handleChange}
-            className="w-full border border-gray-300 p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none"
-            placeholder="Ex: Consulta Odontológica"
-          />
-        </div>
+      <div className="bg-klinik-surface border border-klinik-line rounded-lg p-6 md:p-8">
+        
+        {statusMessage.text && (
+          <div className={`mb-6 p-4 border-l-2 text-sm ${statusMessage.type === 'success' ? 'bg-klinik-whatsapp/5 text-klinik-whatsapp border-klinik-whatsapp/20' : 'bg-red-50 text-red-700 border-red-100'}`}>
+            {statusMessage.text}
+          </div>
+        )}
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Descrição</label>
-          <textarea 
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            className="w-full border border-gray-300 p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none"
-            rows={3}
-            placeholder="Detalhes opcionais..."
-          />
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Duração (minutos)</label>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-medium text-klinik-text">Nomenclatura do serviço</label>
             <input 
-              type="number" 
-              name="durationInMinutes"
+              type="text" 
+              name="name"
               required
-              min="1"
-              value={formData.durationInMinutes}
+              value={formData.name}
               onChange={handleChange}
-              className="w-full border border-gray-300 p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none"
+              className="h-12 px-4 bg-klinik-bg/50 border border-klinik-line focus:border-klinik-primary focus:ring-1 focus:ring-klinik-primary outline-none transition-all rounded-sm text-base"
+              placeholder="Ex: Avaliação Odontológica Primária"
             />
           </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Preço (R$)</label>
-            <input 
-              type="number" 
-              name="price"
-              required
-              step="0.01"
-              min="0"
-              value={formData.price}
+
+          <div className="flex flex-col gap-2">
+            <label className="text-sm font-medium text-klinik-text">Parâmetros operacionais</label>
+            <textarea 
+              name="description"
+              value={formData.description}
               onChange={handleChange}
-              className="w-full border border-gray-300 p-2 rounded focus:ring-2 focus:ring-blue-500 outline-none"
+              className="min-h-[100px] p-4 bg-klinik-bg/50 border border-klinik-line focus:border-klinik-primary focus:ring-1 focus:ring-klinik-primary outline-none transition-all rounded-sm text-base resize-y"
+              placeholder="Descreva pré-requisitos, instruções ou detalhes do procedimento..."
             />
           </div>
-        </div>
 
-        <button 
-          type="submit" 
-          disabled={loading || !businessId || isAuthLoading}
-          className="bg-blue-600 text-white font-medium px-4 py-2 rounded hover:bg-blue-700 w-full disabled:opacity-50 transition-colors"
-        >
-          {loading ? 'Salvando...' : 'Salvar Serviço'}
-        </button>
-      </form>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 border-t border-klinik-line pt-6">
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium text-klinik-text">Tempo de execução (minutos)</label>
+              <input 
+                type="number" 
+                name="durationInMinutes"
+                required
+                min="1"
+                value={formData.durationInMinutes}
+                onChange={handleChange}
+                className="h-12 px-4 bg-klinik-bg/50 border border-klinik-line focus:border-klinik-primary focus:ring-1 focus:ring-klinik-primary outline-none transition-all rounded-sm text-base"
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium text-klinik-text">Valor base (R$)</label>
+              <input 
+                type="number" 
+                name="price"
+                required
+                step="0.01"
+                min="0"
+                value={formData.price}
+                onChange={handleChange}
+                className="h-12 px-4 bg-klinik-bg/50 border border-klinik-line focus:border-klinik-primary focus:ring-1 focus:ring-klinik-primary outline-none transition-all rounded-sm text-base"
+              />
+            </div>
+          </div>
+
+          <div className="pt-4 flex justify-end">
+            <button 
+              type="submit" 
+              disabled={loading || !businessId || isAuthLoading}
+              className="h-12 px-8 bg-klinik-primary hover:bg-klinik-primary-hover text-klinik-surface font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed rounded-sm"
+            >
+              {loading ? 'Indexando...' : 'Registrar no catálogo'}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

@@ -1,18 +1,27 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f3f0e9;
-  --foreground: #1e2521;
-  --ink-muted: #69736d;
-  --line: #dcded6;
-  --green: #174d3b;
-  --green-soft: #dfece3;
-  --orange: #e8784d;
+  --background: #F8FAFC;
+  --foreground: #0F172A;
+  --ink-muted: #64748B;
+  --line: #E2E8F0;
+  --green: #0D9488;
+  --green-soft: #F0FDFA;
+  --orange: #8B5CF6;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-klinik-primary: #0D9488;
+  --color-klinik-primary-hover: #0F766E;
+  --color-klinik-primary-light: #F0FDFA;
+  --color-klinik-accent: #8B5CF6;
+  --color-klinik-whatsapp: #10B981;
+  --color-klinik-bg: #F8FAFC;
+  --color-klinik-surface: #FFFFFF;
+  --color-klinik-text: #0F172A;
+  --color-klinik-muted: #64748B;
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }

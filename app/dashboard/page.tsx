@@ -14,6 +14,7 @@ export default function DashboardPage() {
   
   const [ownerPhone, setOwnerPhone] = useState("");
   const [savingPhone, setSavingPhone] = useState(false);
+  const [statusMessage, setStatusMessage] = useState<{type: "success" | "error" | "", text: string}>({ type: "", text: "" });
 
   useEffect(() => {
     let isMounted = true;
@@ -52,6 +53,8 @@ export default function DashboardPage() {
     if (!businessId) return;
     
     setSavingPhone(true);
+    setStatusMessage({ type: "", text: "" });
+    
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/business/${businessId}/ownerPhone`, {
         method: 'PATCH',
@@ -59,96 +62,87 @@ export default function DashboardPage() {
         body: JSON.stringify({ ownerPhone }),
       });
       if (res.ok) {
-        alert("Número salvo com sucesso! Você receberá notificações neste WhatsApp.");
+        setStatusMessage({ type: "success", text: "Preferências de notificação ativadas." });
       } else {
-        alert("Falha ao salvar o número.");
+        setStatusMessage({ type: "error", text: "Não foi possível registrar o número. Verifique a conexão." });
       }
     } catch (e) {
       console.error(e);
-      alert("Erro ao salvar o número.");
+      setStatusMessage({ type: "error", text: "Não foi possível registrar o número. Tente novamente mais tarde." });
     } finally {
       setSavingPhone(false);
+      setTimeout(() => setStatusMessage({ type: "", text: "" }), 5000);
     }
   };
 
   if (isLoading) {
-    return <main className="dashboard-loading">Carregando seu painel...</main>;
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <div className="text-klinik-muted flex flex-col items-center gap-4">
+          <div className="w-6 h-6 border-2 border-klinik-primary border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-sm">Carregando painel...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <main className="dashboard-shell">
-      <div className="pt-8">
-        <h1>Seu painel está pronto.</h1>
-      </div>
-      <section className="dashboard-welcome" style={{ marginBottom: '24px' }}>
-        <span className="welcome-icon" aria-hidden="true">K</span>
-        <div>
-          <p className="eyebrow">Sessão ativa</p>
-          <h2>{user?.email}</h2>
-          <p>O próximo passo é conectar seus serviços e começar a organizar seus agendamentos.</p>
-          
-          <div style={{ marginTop: '20px', display: 'flex', gap: '10px' }}>
-            <button 
-              onClick={() => router.push('/dashboard/whatsapp')}
-              style={{
-                background: 'var(--accent)',
-                color: 'white',
-                padding: '8px 16px',
-                borderRadius: '6px',
-                border: 'none',
-                cursor: 'pointer',
-                fontWeight: 600
-              }}
-            >
-              Conectar WhatsApp
-            </button>
-          </div>
-        </div>
-      </section>
+    <div className="flex flex-col gap-10 max-w-4xl">
+      <header>
+        <h1 className="text-3xl md:text-4xl font-semibold tracking-tight text-klinik-text mb-2">
+          Seu espaço de trabalho.
+        </h1>
+        <p className="text-klinik-muted text-lg">
+          Autenticado como <span className="font-medium text-klinik-text">{user?.email}</span>
+        </p>
+      </header>
 
-      <section style={{
-        background: 'var(--surface)',
-        padding: '24px',
-        borderRadius: '12px',
-        border: '1px solid var(--border)'
-      }}>
-        <h3 style={{ margin: '0 0 8px 0' }}>Configurações de Notificação</h3>
-        <p style={{ margin: '0 0 16px 0', color: 'var(--text-secondary)', fontSize: '14px' }}>
-          Insira seu número de WhatsApp (com DDI e DDD) para receber notificações em tempo real sempre que a IA finalizar um novo agendamento.
+      <section className="bg-klinik-surface border border-klinik-line rounded-lg p-6 md:p-8">
+        <h2 className="text-xl font-semibold mb-4 text-klinik-text">
+          Configuração de Alertas
+        </h2>
+        <p className="text-klinik-muted mb-8 max-w-2xl leading-relaxed">
+          Forneça o número do WhatsApp administrativo (com DDI e DDD) para receber despachos em tempo real sempre que a inteligência artificial finalizar e confirmar um novo agendamento de paciente.
         </p>
         
-        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
           <input 
             type="text" 
             placeholder="Ex: 5511999999999"
             value={ownerPhone}
             onChange={(e) => setOwnerPhone(e.target.value)}
-            style={{
-              padding: '10px 12px',
-              border: '1px solid var(--border)',
-              borderRadius: '6px',
-              flex: 1,
-              maxWidth: '300px'
-            }}
+            className="w-full sm:w-80 h-12 px-4 bg-klinik-bg/50 border border-klinik-line focus:border-klinik-primary focus:ring-1 focus:ring-klinik-primary outline-none transition-all rounded-sm text-base placeholder:text-klinik-muted/60"
           />
           <button 
             onClick={handleSavePhone}
             disabled={savingPhone || !ownerPhone}
-            style={{
-              background: '#198754',
-              color: 'white',
-              padding: '10px 16px',
-              borderRadius: '6px',
-              border: 'none',
-              cursor: (savingPhone || !ownerPhone) ? 'not-allowed' : 'pointer',
-              fontWeight: 600,
-              opacity: (savingPhone || !ownerPhone) ? 0.7 : 1
-            }}
+            className="h-12 px-6 bg-klinik-primary hover:bg-klinik-primary-hover text-klinik-surface font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed rounded-sm whitespace-nowrap"
           >
-            {savingPhone ? 'Salvando...' : 'Salvar Número'}
+            {savingPhone ? "Registrando..." : "Ativar notificações"}
           </button>
         </div>
+
+        {statusMessage.text && (
+          <div className={`mt-4 p-3 border-l-2 text-sm max-w-md ${statusMessage.type === 'success' ? 'border-klinik-whatsapp bg-klinik-whatsapp/10 text-klinik-whatsapp' : 'border-red-500 bg-red-50 text-red-700'}`}>
+            {statusMessage.text}
+          </div>
+        )}
       </section>
-    </main>
+
+      <section className="bg-klinik-bg border border-klinik-line rounded-lg p-6 md:p-8 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div>
+          <h2 className="text-lg font-medium mb-1">Integração do Agente</h2>
+          <p className="text-klinik-muted text-sm max-w-md">
+            Seu próximo passo é vincular um dispositivo WhatsApp para permitir que o modelo de linguagem atenda seus pacientes.
+          </p>
+        </div>
+        <button 
+          onClick={() => router.push('/dashboard/whatsapp')}
+          className="px-6 py-3 bg-klinik-text hover:bg-black text-white text-sm font-medium rounded-sm transition-colors whitespace-nowrap"
+        >
+          Configurar integração
+        </button>
+      </section>
+    </div>
   );
 }

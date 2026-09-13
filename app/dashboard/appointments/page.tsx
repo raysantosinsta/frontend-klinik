@@ -52,104 +52,103 @@ export default function AppointmentsPage() {
   };
 
   if (isLoading) {
-    return <main className="dashboard-loading">Carregando agendamentos...</main>;
+    return (
+      <div className="min-h-[60vh] flex items-center justify-center">
+        <div className="text-klinik-muted flex flex-col items-center gap-4">
+          <div className="w-6 h-6 border-2 border-klinik-primary border-t-transparent rounded-full animate-spin"></div>
+          <p className="text-sm">Recuperando registros...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <main className="dashboard-shell">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-        <h2>Agendamentos</h2>
-      </div>
+    <div className="flex flex-col max-w-6xl gap-8">
+      <header className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-klinik-line pb-6">
+        <div>
+          <h1 className="text-3xl font-semibold tracking-tight text-klinik-text mb-2">
+            Agendamentos
+          </h1>
+          <p className="text-klinik-muted text-lg">
+            Registros processados e triados pelo agente de IA.
+          </p>
+        </div>
+        <div className="text-sm text-klinik-muted">
+          Total de registros: <span className="font-medium text-klinik-text">{appointments.length}</span>
+        </div>
+      </header>
 
       {appointments.length === 0 ? (
-        <div style={{
-          padding: '40px',
-          textAlign: 'center',
-          background: 'var(--surface)',
-          borderRadius: '12px',
-          border: '1px solid var(--border)'
-        }}>
-          <p style={{ color: 'var(--text-secondary)' }}>Nenhum agendamento encontrado.</p>
-          <p style={{ fontSize: '14px', marginTop: '8px' }}>Quando a IA concluir um agendamento pelo WhatsApp, ele aparecerá aqui.</p>
+        <div className="flex flex-col items-center justify-center py-20 px-4 border border-dashed border-klinik-line rounded-lg bg-klinik-surface/50">
+          <div className="w-12 h-12 bg-klinik-bg rounded-full flex items-center justify-center mb-4 text-klinik-muted">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+          </div>
+          <p className="text-klinik-text font-medium mb-1">Base de registros vazia</p>
+          <p className="text-sm text-klinik-muted max-w-md text-center">
+            Quando a IA interceptar uma intenção de agendamento no WhatsApp e concluir a reserva, o registro será indexado aqui.
+          </p>
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <div className="flex flex-col gap-3">
           {appointments.map((app) => (
-            <div key={app.id} style={{
-              padding: '20px',
-              background: 'var(--surface)',
-              borderRadius: '12px',
-              border: '1px solid var(--border)',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center'
-            }}>
-              <div>
-                <h3 style={{ margin: '0 0 4px 0', fontSize: '16px' }}>{app.clientName} <span style={{ color: 'var(--text-secondary)', fontSize: '14px', fontWeight: 'normal' }}>({app.clientPhone})</span></h3>
-                <p style={{ margin: '0 0 8px 0', fontSize: '14px', color: 'var(--text-secondary)' }}>
-                  {app.service.name} • R$ {app.service.price} • {new Date(app.date).toLocaleString()}
-                </p>
-                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                  <span style={{
-                    padding: '4px 8px',
-                    borderRadius: '4px',
-                    fontSize: '12px',
-                    fontWeight: 'bold',
-                    background: app.status === 'PENDING' ? '#FFF3CD' : app.status === 'CONFIRMED' ? '#D1E7DD' : '#F8D7DA',
-                    color: app.status === 'PENDING' ? '#856404' : app.status === 'CONFIRMED' ? '#0F5132' : '#842029',
-                  }}>
-                    {app.status === 'PENDING' ? 'PENDENTE' : app.status === 'CONFIRMED' ? 'CONFIRMADO' : 'CANCELADO'}
+            <div key={app.id} className="group bg-klinik-surface border border-klinik-line rounded-md p-5 flex flex-col md:flex-row md:items-center justify-between gap-6 hover:border-klinik-primary/30 transition-colors">
+              
+              <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-8 flex-1">
+                <div className="min-w-[120px]">
+                  <p className="text-xs font-semibold text-klinik-muted uppercase tracking-wider mb-1">Horário</p>
+                  <p className="font-medium text-klinik-text">
+                    {new Date(app.date).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  </p>
+                  <p className="text-sm text-klinik-muted">
+                    {new Date(app.date).toLocaleDateString()}
+                  </p>
+                </div>
+                
+                <div className="flex-1">
+                  <p className="text-xs font-semibold text-klinik-muted uppercase tracking-wider mb-1">Paciente</p>
+                  <div className="flex items-center gap-2">
+                    <p className="font-medium text-klinik-text text-lg">{app.clientName}</p>
+                    <span className="text-xs text-klinik-muted bg-klinik-bg px-2 py-0.5 rounded-sm">{app.clientPhone}</span>
+                  </div>
+                  <p className="text-sm text-klinik-primary mt-1 font-medium">
+                    {app.service.name}
+                  </p>
+                </div>
+
+                <div className="md:px-4">
+                  <span className={`inline-flex items-center px-2.5 py-1 rounded-sm text-xs font-semibold border ${
+                    app.status === 'PENDING' ? 'bg-yellow-50 text-yellow-700 border-yellow-200' : 
+                    app.status === 'CONFIRMED' ? 'bg-klinik-whatsapp/10 text-klinik-whatsapp border-klinik-whatsapp/20' : 
+                    'bg-red-50 text-red-700 border-red-200'
+                  }`}>
+                    {app.status === 'PENDING' ? 'Aguardando validação' : app.status === 'CONFIRMED' ? 'Reserva confirmada' : 'Reserva cancelada'}
                   </span>
                 </div>
               </div>
               
-              <div style={{ display: 'flex', gap: '8px' }}>
+              <div className="flex flex-wrap items-center gap-2 pt-4 md:pt-0 border-t md:border-t-0 border-klinik-line">
                 {app.status === 'PENDING' && (
                   <>
                     <button 
                       onClick={() => changeStatus(app.id, 'CONFIRMED')}
-                      style={{
-                        padding: '8px 16px',
-                        background: '#198754',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '6px',
-                        cursor: 'pointer',
-                        fontWeight: '600'
-                      }}
+                      className="px-4 py-2 bg-klinik-primary hover:bg-klinik-primary-hover text-white text-sm font-medium rounded-sm transition-colors"
                     >
-                      Confirmar
+                      Aprovar reserva
                     </button>
                     <button 
                       onClick={() => changeStatus(app.id, 'CANCELLED')}
-                      style={{
-                        padding: '8px 16px',
-                        background: 'transparent',
-                        color: '#DC3545',
-                        border: '1px solid #DC3545',
-                        borderRadius: '6px',
-                        cursor: 'pointer',
-                        fontWeight: '600'
-                      }}
+                      className="px-4 py-2 bg-white hover:bg-red-50 text-red-600 border border-red-200 hover:border-red-300 text-sm font-medium rounded-sm transition-colors"
                     >
-                      Cancelar
+                      Rejeitar
                     </button>
                   </>
                 )}
                 {app.status !== 'PENDING' && (
                   <button 
                     onClick={() => changeStatus(app.id, 'PENDING')}
-                    style={{
-                      padding: '8px 16px',
-                      background: 'var(--border)',
-                      color: 'var(--text)',
-                      border: 'none',
-                      borderRadius: '6px',
-                      cursor: 'pointer',
-                      fontWeight: '600'
-                    }}
+                    className="px-4 py-2 bg-klinik-bg hover:bg-gray-200 text-klinik-text text-sm font-medium rounded-sm transition-colors"
                   >
-                    Reabrir
+                    Reabrir triagem
                   </button>
                 )}
               </div>
@@ -157,6 +156,6 @@ export default function AppointmentsPage() {
           ))}
         </div>
       )}
-    </main>
+    </div>
   );
 }

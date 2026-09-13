@@ -29,79 +29,98 @@ export default function ChatTestPage() {
       setHistory(prev => [...prev, { role: 'assistant', content: data.answer }]);
     } catch (err) {
       console.error(err);
-      setHistory(prev => [...prev, { role: 'assistant', content: 'Erro ao se conectar com o servidor.' }]);
+      setHistory(prev => [...prev, { role: 'assistant', content: 'Exception: Timeout ou falha no LLM.' }]);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex flex-col items-center justify-center p-8 bg-gray-50 h-[calc(100vh-64px)]">
-      <div className="w-full max-w-2xl bg-white shadow-xl rounded-2xl flex flex-col h-full border border-gray-100 overflow-hidden">
+    <div className="flex flex-col h-[calc(100vh-140px)] max-w-4xl">
+      <header className="mb-6">
+        <h1 className="text-3xl font-semibold tracking-tight text-klinik-text mb-2">
+          Depurador do Agente
+        </h1>
+        <p className="text-klinik-muted text-sm">
+          Simulador de contexto isolado. Teste a recuperação (RAG) da base de conhecimento da IA antes de habilitar no WhatsApp.
+        </p>
+      </header>
+
+      <div className="flex-1 bg-white border border-klinik-line rounded-lg shadow-sm flex flex-col overflow-hidden">
         
-        {/* Header do WhatsApp fake */}
-        <div className="bg-[#075E54] text-white p-4 flex items-center shadow-md z-10">
-          <div className="w-10 h-10 bg-white rounded-full flex items-center justify-center text-[#075E54] font-bold text-xl mr-3">
-            B
-          </div>
+        {/* Header do Chat (Tech/AI Theme) */}
+        <div className="bg-klinik-text text-white p-4 flex items-center border-b border-gray-800">
+          <div className="w-2 h-2 bg-klinik-accent rounded-full animate-pulse mr-3 shadow-[0_0_8px_rgba(139,92,246,0.8)]"></div>
           <div>
-            <h1 className="font-semibold text-lg leading-tight">Clínica BemStar (IA)</h1>
-            <p className="text-xs text-green-200">Online</p>
+            <h2 className="font-medium text-sm tracking-wide text-gray-200">Klinik OS — LLM RAG Pipeline</h2>
+            <p className="text-xs text-klinik-accent">Ambiente de Teste (Isolado)</p>
           </div>
         </div>
 
         {/* Área de Mensagens */}
-        <div className="flex-1 overflow-y-auto p-4 bg-[#E5DDD5] flex flex-col space-y-4">
+        <div className="flex-1 overflow-y-auto p-6 bg-klinik-bg/30 flex flex-col space-y-6">
           
           {history.length === 0 && (
-            <div className="bg-[#DCF8C6] text-gray-800 text-sm p-3 rounded-lg self-center mt-4 text-center max-w-md shadow-sm">
-              Envie uma mensagem para testar a base de conhecimento do PDF (RAG).
+            <div className="text-xs text-klinik-muted self-center mt-10 text-center max-w-sm border border-klinik-line bg-white p-4 rounded-sm">
+              <p className="font-semibold text-klinik-text mb-1">Contexto inicializado.</p>
+              Aguardando prompt do usuário para iniciar vetorização e síntese de resposta.
             </div>
           )}
 
           {history.map((msg, i) => (
             <div 
               key={i} 
-              className={`p-3 rounded-xl max-w-[80%] shadow-sm relative ${
-                msg.role === 'user' 
-                  ? 'bg-[#DCF8C6] ml-auto rounded-tr-none text-gray-800' 
-                  : 'bg-white mr-auto rounded-tl-none text-gray-800'
+              className={`flex flex-col max-w-[85%] ${
+                msg.role === 'user' ? 'self-end items-end' : 'self-start items-start'
               }`}
             >
-              <p className="whitespace-pre-wrap">{msg.content}</p>
-              <span className="text-[10px] text-gray-400 absolute bottom-1 right-2">
-                {new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+              <span className="text-[10px] font-semibold text-klinik-muted uppercase tracking-wider mb-1 px-1">
+                {msg.role === 'user' ? 'Prompt (Usuário)' : 'Response (LLM)'}
               </span>
+              <div className={`p-4 rounded-sm text-sm leading-relaxed border ${
+                msg.role === 'user' 
+                  ? 'bg-klinik-primary text-white border-klinik-primary-hover shadow-sm' 
+                  : 'bg-white text-klinik-text border-klinik-line shadow-sm'
+              }`}>
+                <p className="whitespace-pre-wrap">{msg.content}</p>
+              </div>
             </div>
           ))}
+
           {loading && (
-            <div className="bg-white mr-auto rounded-xl rounded-tl-none p-3 shadow-sm flex space-x-1 items-center h-10">
-              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-              <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
+            <div className="self-start flex flex-col max-w-[85%]">
+              <span className="text-[10px] font-semibold text-klinik-muted uppercase tracking-wider mb-1 px-1">
+                Response (LLM)
+              </span>
+              <div className="bg-white border border-klinik-line rounded-sm p-4 shadow-sm flex space-x-1 items-center h-12">
+                <div className="w-1.5 h-1.5 bg-klinik-primary rounded-full animate-bounce"></div>
+                <div className="w-1.5 h-1.5 bg-klinik-primary rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                <div className="w-1.5 h-1.5 bg-klinik-primary rounded-full animate-bounce" style={{ animationDelay: '0.4s' }}></div>
+              </div>
             </div>
           )}
         </div>
 
         {/* Input */}
-        <div className="bg-[#F0F0F0] p-3 flex items-center space-x-2">
-          <input 
-            type="text"
-            className="flex-1 bg-white border border-gray-300 rounded-full py-3 px-5 focus:outline-none focus:ring-2 focus:ring-[#128C7E] focus:border-transparent text-gray-700" 
-            value={message} 
-            onChange={e => setMessage(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && sendMessage()}
-            placeholder="Digite sua dúvida clínica..." 
-          />
-          <button 
-            onClick={sendMessage} 
-            disabled={!businessId || isAuthLoading}
-            className="bg-[#128C7E] hover:bg-[#075E54] text-white w-12 h-12 rounded-full flex items-center justify-center transition-colors shadow-md disabled:opacity-50"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5 ml-1">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M6 12 3.269 3.125A59.769 59.769 0 0 1 21.485 12 59.768 59.768 0 0 1 3.27 20.875L5.999 12Zm0 0h7.5" />
-            </svg>
-          </button>
+        <div className="bg-white p-4 border-t border-klinik-line">
+          <div className="flex items-center gap-3">
+            <input 
+              type="text"
+              className="flex-1 bg-klinik-bg border border-klinik-line rounded-sm py-3 px-4 focus:outline-none focus:border-klinik-primary focus:ring-1 focus:ring-klinik-primary text-sm text-klinik-text transition-all" 
+              value={message} 
+              onChange={e => setMessage(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && sendMessage()}
+              placeholder="Sintetize uma query para o modelo..." 
+              autoFocus
+            />
+            <button 
+              onClick={sendMessage} 
+              disabled={!businessId || isAuthLoading || !message.trim()}
+              className="bg-klinik-accent hover:bg-[#7c3aed] text-white px-6 py-3 rounded-sm font-medium text-sm transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+            >
+              Executar
+            </button>
+          </div>
         </div>
       </div>
     </div>

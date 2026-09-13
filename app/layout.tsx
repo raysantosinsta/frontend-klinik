@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { AuthProvider } from "@/components/AuthProvider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -14,10 +15,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Klinik OS",
-  description: "Painel de atendimento e agendamentos para o seu negócio.",
+  description: "Plataforma integrada de atendimento e inteligência artificial.",
 };
-
-import { AuthProvider } from "@/components/AuthProvider";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -25,7 +24,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       lang="pt-BR"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
+      <body className="min-h-full flex flex-col bg-klinik-bg text-klinik-text">
         <AuthProvider>
           {children}
         </AuthProvider>

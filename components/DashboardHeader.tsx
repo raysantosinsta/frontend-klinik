@@ -17,41 +17,40 @@ export function DashboardHeader() {
   };
 
   const navLinks = [
-    { href: "/dashboard", label: "Início" },
+    { href: "/dashboard", label: "Visão geral" },
     { href: "/dashboard/appointments", label: "Agendamentos" },
-    { href: "/dashboard/whatsapp", label: "WhatsApp" },
-    { href: "/dashboard/chat-test", label: "Testar IA" },
-    { href: "/dashboard/documents/new", label: "Base de Conhecimento" },
-    { href: "/dashboard/services/new", label: "Serviços" },
+    { href: "/dashboard/whatsapp", label: "Integração IA" },
+    { href: "/dashboard/chat-test", label: "Depurador IA" },
+    { href: "/dashboard/documents/new", label: "Base de conhecimento" },
+    { href: "/dashboard/services/new", label: "Serviços clínicos" },
   ];
 
   return (
-    <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
+    <header className="bg-klinik-surface border-b border-klinik-line sticky top-0 z-50 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16">
-          <div className="flex">
+        <div className="flex justify-between h-16 lg:h-20 items-center">
+          
+          <div className="flex items-center">
             {/* Logo / Brand */}
-            <div className="flex-shrink-0 flex items-center">
-              <Link href="/dashboard" className="flex items-center gap-2">
-                <div className="w-8 h-8 bg-[#174d3b] text-white rounded-md flex items-center justify-center font-bold">
-                  K
-                </div>
-                <span className="font-bold text-gray-900 text-lg hidden md:block">Klinik OS</span>
-              </Link>
-            </div>
+            <Link href="/dashboard" className="flex items-center gap-3 mr-10 group">
+              <div className="w-9 h-9 bg-klinik-primary text-klinik-surface rounded-xl rounded-tr-sm flex items-center justify-center font-bold text-lg shadow-[0_2px_8px_rgba(13,148,136,0.25)] group-hover:shadow-[0_4px_12px_rgba(13,148,136,0.4)] transition-all">
+                K
+              </div>
+              <span className="font-semibold text-klinik-text text-lg tracking-tight hidden md:block">Klinik</span>
+            </Link>
             
             {/* Nav Links */}
-            <nav className="hidden sm:ml-8 sm:flex sm:space-x-8">
+            <nav className="hidden lg:flex lg:space-x-1">
               {navLinks.map((link) => {
                 const isActive = pathname === link.href;
                 return (
                   <Link
                     key={link.href}
                     href={link.href}
-                    className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium transition-colors ${
+                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
                       isActive
-                        ? "border-[#174d3b] text-gray-900"
-                        : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
+                        ? "bg-klinik-primary/10 text-klinik-primary"
+                        : "text-klinik-muted hover:bg-klinik-bg hover:text-klinik-text"
                     }`}
                   >
                     {link.label}
@@ -61,31 +60,31 @@ export function DashboardHeader() {
             </nav>
           </div>
 
-          <div className="flex items-center gap-4">
-            <div className="hidden sm:block text-sm text-gray-500">
+          <div className="flex items-center gap-6">
+            <div className="hidden sm:block text-sm font-medium text-klinik-muted">
               {user?.email}
             </div>
             <button
               onClick={handleSignOut}
-              className="text-sm font-medium text-red-600 hover:text-red-800 transition-colors"
+              className="text-sm font-medium text-red-500 hover:text-red-700 hover:bg-red-50 px-3 py-1.5 rounded-md transition-colors"
             >
-              Sair
+              Encerrar sessão
             </button>
           </div>
         </div>
         
-        {/* Mobile menu (simple version) */}
-        <div className="sm:hidden flex overflow-x-auto py-2 space-x-4 border-t border-gray-100">
+        {/* Mobile menu */}
+        <div className="lg:hidden flex overflow-x-auto py-3 space-x-2 border-t border-klinik-line scrollbar-hide">
           {navLinks.map((link) => {
             const isActive = pathname === link.href;
             return (
               <Link
                 key={link.href}
                 href={link.href}
-                className={`whitespace-nowrap px-3 py-1 rounded-md text-sm font-medium ${
+                className={`whitespace-nowrap px-4 py-1.5 rounded-md text-sm font-medium transition-colors ${
                   isActive
-                    ? "bg-[#dfece3] text-[#174d3b]"
-                    : "text-gray-600 hover:bg-gray-100"
+                    ? "bg-klinik-primary/10 text-klinik-primary"
+                    : "text-klinik-muted hover:bg-klinik-bg"
                 }`}
               >
                 {link.label}

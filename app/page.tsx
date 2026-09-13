@@ -20,25 +20,23 @@ export default function Home() {
     setIsSubmitting(true);
 
     if (!isSupabaseConfigured) {
-      setError("Configure as variáveis do Supabase no arquivo .env.local antes de entrar.");
+      setError("As credenciais do banco de dados não estão configuradas no ambiente.");
       setIsSubmitting(false);
       return;
     }
 
     if (mode === "register") {
-      // 1. Cadastrar no Supabase
       const { data: authData, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
       });
 
       if (signUpError || !authData.user) {
-        setError(signUpError?.message || "Erro ao criar conta. Verifique os dados.");
+        setError(signUpError?.message || "Falha ao registrar credenciais. Verifique o formato do e-mail e senha.");
         setIsSubmitting(false);
         return;
       }
 
-      // 2. Criar a clínica e vincular ao usuário no Backend
       try {
         const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/register`, {
           method: "POST",
@@ -52,23 +50,22 @@ export default function Home() {
         });
 
         if (!res.ok) {
-          throw new Error("Erro ao criar perfil e clínica.");
+          throw new Error("Falha de sincronização com o painel central.");
         }
       } catch (err) {
         console.error(err);
-        setError("Conta criada, mas houve erro ao configurar a clínica.");
+        setError("Autenticação criada, mas houve uma falha de rede ao provisionar a clínica.");
         setIsSubmitting(false);
         return;
       }
     } else {
-      // Login normal
       const { error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (signInError) {
-        setError("E-mail ou senha inválidos. Confira os dados e tente novamente.");
+        setError("Credenciais inválidas. Verifique seu endereço de e-mail e senha.");
         setIsSubmitting(false);
         return;
       }
@@ -79,133 +76,118 @@ export default function Home() {
   }
 
   return (
-    <main className="login-shell">
-      <section className="login-intro" aria-label="Sobre a Klinik">
-        <div className="brand-mark">K</div>
-        <p className="eyebrow">Klinik OS</p>
-        <h1>Mais tempo para cuidar. Menos tempo no WhatsApp.</h1>
-        <p className="intro-copy">
-          O painel da Klinik organiza seus atendimentos, agendamentos e a base de
-          conhecimento do seu negócio em um só lugar.
-        </p>
-        <div className="intro-note">
-          <span className="status-dot" aria-hidden="true" />
-          <span>Seu espaço de trabalho, sempre por perto.</span>
-        </div>
-      </section>
-
-      <section className="login-panel" aria-labelledby="login-title">
-        <div className="login-heading">
-          <div className="auth-tabs" style={{ display: 'flex', gap: '20px', marginBottom: '24px', borderBottom: '1px solid var(--line)' }}>
-            <button 
-              type="button"
-              onClick={() => setMode("login")}
-              style={{ 
-                background: 'transparent',
-                border: 'none',
-                cursor: 'pointer',
-                fontSize: '1.1rem',
-                fontWeight: mode === 'login' ? '700' : '500', 
-                color: mode === 'login' ? 'var(--green)' : 'var(--ink-muted)',
-                borderBottom: mode === 'login' ? '3px solid var(--green)' : '3px solid transparent', 
-                paddingBottom: '8px',
-                transition: 'all 0.2s ease'
-              }}
-            >
-              Entrar
-            </button>
-            <button 
-              type="button"
-              onClick={() => setMode("register")}
-              style={{ 
-                background: 'transparent',
-                border: 'none',
-                cursor: 'pointer',
-                fontSize: '1.1rem',
-                fontWeight: mode === 'register' ? '700' : '500', 
-                color: mode === 'register' ? 'var(--green)' : 'var(--ink-muted)',
-                borderBottom: mode === 'register' ? '3px solid var(--green)' : '3px solid transparent', 
-                paddingBottom: '8px',
-                transition: 'all 0.2s ease'
-              }}
-            >
-              Criar Conta
-            </button>
-          </div>
+    <main className="min-h-screen bg-klinik-bg text-klinik-text flex flex-col lg:flex-row items-center justify-center p-6 md:p-12 relative overflow-hidden">
+        
+        {/* Main Content Container */}
+        <div className="w-full max-w-6xl grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 relative z-10">
           
-          <h2 id="login-title">
-            {mode === "login" ? "Bem-vindo de volta" : "Comece a usar a Klinik"}
-          </h2>
-          <p>
-            {mode === "login" 
-              ? "Entre para acessar o painel do seu negócio." 
-              : "Preencha seus dados para criar o perfil da sua clínica."}
-          </p>
+          {/* Left: Branding & Hero */}
+          <section className="flex flex-col justify-center">
+             <div className="w-12 h-12 bg-klinik-primary text-klinik-surface flex items-center justify-center text-xl font-bold rounded-xl rounded-tr-sm mb-16 shadow-[0_4px_14px_rgba(13,148,136,0.3)]">
+               K
+             </div>
+             
+             <h1 className="text-4xl md:text-5xl lg:text-6xl font-semibold leading-tight tracking-tight mb-6">
+                Mais tempo para cuidar. <br/><span className="text-klinik-muted">Menos tempo no WhatsApp.</span>
+             </h1>
+             
+             <p className="text-lg text-klinik-muted max-w-md leading-relaxed mb-16">
+                Organize seus atendimentos, gerencie agendamentos e unifique o conhecimento do seu negócio em uma única plataforma estruturada.
+             </p>
+             
+             <div className="flex items-center gap-3 text-sm font-medium text-klinik-primary">
+                <span className="w-2 h-2 rounded-full bg-klinik-accent shadow-[0_0_10px_rgba(139,92,246,0.6)]"></span>
+                Infraestrutura de IA ativa
+             </div>
+          </section>
+
+          {/* Right: Action Area */}
+          <section className="flex items-center justify-center lg:justify-end">
+             <div className="w-full max-w-md bg-klinik-surface p-8 md:p-10 shadow-sm border border-klinik-line">
+                <div className="flex gap-6 mb-10 border-b border-klinik-line">
+                   <button 
+                     type="button" 
+                     onClick={() => { setMode("login"); setError(""); }}
+                     className={`pb-4 text-sm font-medium transition-colors ${mode === "login" ? "text-klinik-primary border-b-2 border-klinik-primary" : "text-klinik-muted hover:text-klinik-text"}`}
+                   >
+                     Acessar painel
+                   </button>
+                   <button 
+                     type="button" 
+                     onClick={() => { setMode("register"); setError(""); }}
+                     className={`pb-4 text-sm font-medium transition-colors ${mode === "register" ? "text-klinik-primary border-b-2 border-klinik-primary" : "text-klinik-muted hover:text-klinik-text"}`}
+                   >
+                     Criar espaço de trabalho
+                   </button>
+                </div>
+
+                <h2 className="text-2xl font-semibold mb-2 tracking-tight">
+                   {mode === "login" ? "Autenticação" : "Novo espaço de trabalho"}
+                </h2>
+                <p className="text-klinik-muted mb-8 text-sm leading-relaxed">
+                   {mode === "login" ? "Insira suas credenciais para gerenciar a clínica." : "Forneça os detalhes iniciais para estruturar seu negócio."}
+                </p>
+
+                <form onSubmit={handleSubmit} className="flex flex-col gap-6">
+                   {mode === "register" && (
+                     <>
+                        <div className="flex flex-col gap-2">
+                           <label htmlFor="name" className="text-sm font-medium">Nome do responsável</label>
+                           <input 
+                             id="name" name="name" type="text" 
+                             className="h-12 px-4 bg-klinik-bg/30 border border-klinik-line focus:border-klinik-primary focus:ring-1 focus:ring-klinik-primary outline-none transition-all rounded-sm text-base" 
+                             value={name} onChange={(e) => setName(e.target.value)} required 
+                           />
+                        </div>
+                        <div className="flex flex-col gap-2">
+                           <label htmlFor="businessName" className="text-sm font-medium">Nome da clínica</label>
+                           <input 
+                             id="businessName" name="businessName" type="text" 
+                             className="h-12 px-4 bg-klinik-bg/30 border border-klinik-line focus:border-klinik-primary focus:ring-1 focus:ring-klinik-primary outline-none transition-all rounded-sm text-base" 
+                             value={businessName} onChange={(e) => setBusinessName(e.target.value)} required 
+                           />
+                        </div>
+                     </>
+                   )}
+
+                   <div className="flex flex-col gap-2">
+                      <label htmlFor="email" className="text-sm font-medium">Endereço de e-mail</label>
+                      <input 
+                        id="email" name="email" type="email" autoComplete="email"
+                        className="h-12 px-4 bg-klinik-bg/30 border border-klinik-line focus:border-klinik-primary focus:ring-1 focus:ring-klinik-primary outline-none transition-all rounded-sm text-base" 
+                        value={email} onChange={(e) => setEmail(e.target.value)} required 
+                      />
+                   </div>
+
+                   <div className="flex flex-col gap-2">
+                      <div className="flex justify-between items-baseline">
+                         <label htmlFor="password" className="text-sm font-medium">Senha</label>
+                         {mode === "login" && <span className="text-klinik-muted text-xs cursor-pointer hover:text-klinik-text transition-colors">Recuperar acesso</span>}
+                      </div>
+                      <input 
+                        id="password" name="password" type="password" autoComplete="current-password"
+                        className="h-12 px-4 bg-klinik-bg/30 border border-klinik-line focus:border-klinik-primary focus:ring-1 focus:ring-klinik-primary outline-none transition-all rounded-sm text-base" 
+                        value={password} onChange={(e) => setPassword(e.target.value)} minLength={6} required 
+                      />
+                   </div>
+
+                   {error && (
+                     <div className="p-3 mt-2 border-l-2 border-red-500 bg-red-50 text-red-700 text-sm">
+                       {error}
+                     </div>
+                   )}
+
+                   <button 
+                     type="submit" 
+                     disabled={isSubmitting}
+                     className="mt-2 h-12 bg-klinik-primary hover:bg-klinik-primary-hover text-klinik-surface font-medium transition-all disabled:opacity-70 disabled:cursor-not-allowed rounded-sm shadow-[0_2px_4px_rgba(13,148,136,0.2)] hover:shadow-[0_4px_8px_rgba(13,148,136,0.3)] active:translate-y-0.5"
+                   >
+                     {isSubmitting ? "Autenticando..." : (mode === "login" ? "Acessar painel" : "Criar espaço de trabalho")}
+                   </button>
+                </form>
+             </div>
+          </section>
         </div>
-
-        <form className="login-form" onSubmit={handleSubmit}>
-          {mode === "register" && (
-            <>
-              <label htmlFor="name">Seu Nome</label>
-              <input
-                id="name"
-                name="name"
-                type="text"
-                placeholder="Dr. João Silva"
-                value={name}
-                onChange={(event) => setName(event.target.value)}
-                required
-              />
-              <label htmlFor="businessName">Nome da Clínica</label>
-              <input
-                id="businessName"
-                name="businessName"
-                type="text"
-                placeholder="Clínica BemStar"
-                value={businessName}
-                onChange={(event) => setBusinessName(event.target.value)}
-                required
-              />
-            </>
-          )}
-
-          <label htmlFor="email">E-mail</label>
-          <input
-            id="email"
-            name="email"
-            type="email"
-            autoComplete="email"
-            placeholder="voce@seunegocio.com"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            required
-          />
-
-          <div className="password-label">
-            <label htmlFor="password">Senha</label>
-          </div>
-          <input
-            id="password"
-            name="password"
-            type="password"
-            autoComplete="current-password"
-            placeholder="Digite sua senha"
-            value={password}
-            onChange={(event) => setPassword(event.target.value)}
-            minLength={6}
-            required
-          />
-
-          {error && <p className="form-error" role="alert">{error}</p>}
-
-          <button className="submit-button" type="submit" disabled={isSubmitting}>
-            {isSubmitting ? "Aguarde..." : (mode === "login" ? "Entrar no painel" : "Criar Minha Conta")}
-            <span aria-hidden="true">-&gt;</span>
-          </button>
-        </form>
-
-        <p className="login-footer">Acesso protegido por autenticação Supabase.</p>
-      </section>
     </main>
   );
 }
