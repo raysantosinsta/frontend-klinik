@@ -11,12 +11,13 @@ export default function WhatsAppSettingsPage() {
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [qrCode, setQrCode] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isActionLoading, setIsActionLoading] = useState<boolean>(false);
   const [statusMessage, setStatusMessage] = useState<{type: "success" | "error" | "", text: string}>({ type: "", text: "" });
 
   const fetchStatus = async () => {
     if (!businessId) return;
     try {
-      setIsLoading(true);
+      // Background poll não deve bloquear a interface
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/whatsapp/status/${businessId}`);
       if (res.ok) {
         const data = await res.json();
@@ -44,7 +45,7 @@ export default function WhatsAppSettingsPage() {
 
   const handleConnect = async () => {
     try {
-      setIsLoading(true);
+      setIsActionLoading(true);
       setStatusMessage({ type: "", text: "" });
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/whatsapp/connect/${businessId}`, {
         method: 'POST',
@@ -62,7 +63,7 @@ export default function WhatsAppSettingsPage() {
       console.error(err);
       setStatusMessage({ type: "error", text: "Falha na rede ao tentar contactar a Evolution API." });
     } finally {
-      setIsLoading(false);
+      setIsActionLoading(false);
     }
   };
 
@@ -71,7 +72,7 @@ export default function WhatsAppSettingsPage() {
     if (!window.confirm('Isto irá interromper o atendimento automático da IA. Deseja realmente desconectar o dispositivo?')) return;
 
     try {
-      setIsLoading(true);
+      setIsActionLoading(true);
       setStatusMessage({ type: "", text: "" });
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/whatsapp/disconnect/${businessId}`, {
         method: 'DELETE',
@@ -86,7 +87,7 @@ export default function WhatsAppSettingsPage() {
       console.error(err);
       setStatusMessage({ type: "error", text: "Falha ao interromper a conexão no servidor." });
     } finally {
-      setIsLoading(false);
+      setIsActionLoading(false);
       setTimeout(() => setStatusMessage({ type: "", text: "" }), 5000);
     }
   };
@@ -119,20 +120,20 @@ export default function WhatsAppSettingsPage() {
             {!isConnected && !qrCode && (
               <button
                 onClick={handleConnect}
-                disabled={isLoading || !businessId || isAuthLoading}
+                disabled={isActionLoading || !businessId || isAuthLoading}
                 className="bg-klinik-text hover:bg-black text-white px-5 py-2 rounded-sm text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isLoading || isAuthLoading ? 'Iniciando túnel...' : 'Vincular dispositivo'}
+                {isActionLoading ? 'Iniciando túnel...' : 'Vincular dispositivo'}
               </button>
             )}
 
             {isConnected && (
               <button
                 onClick={handleDisconnect}
-                disabled={isLoading}
+                disabled={isActionLoading}
                 className="bg-white hover:bg-red-50 text-red-600 border border-red-200 hover:border-red-300 px-5 py-2 rounded-sm text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isLoading ? 'Interrompendo...' : 'Desconectar dispositivo'}
+                {isActionLoading ? 'Interrompendo...' : 'Desconectar dispositivo'}
               </button>
             )}
           </div>
