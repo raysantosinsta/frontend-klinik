@@ -3,6 +3,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { User } from "@supabase/supabase-js";
+import { getUserProfile } from "@/app/actions/auth";
 
 interface AuthContextType {
   user: User | null;
@@ -32,11 +33,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (session?.user) {
         setUser(session.user);
         
-        // Fetch businessId from backend
+        // Fetch businessId from backend via server action
         try {
-          const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/me/${session.user.id}`);
-          if (res.ok) {
-            const profile = await res.json();
+          const profile = await getUserProfile(session.user.id);
+          if (profile) {
             setBusinessId(profile.businessId);
           }
         } catch (e) {
@@ -58,9 +58,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (session?.user) {
         setUser(session.user);
         try {
-          const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/me/${session.user.id}`);
-          if (res.ok) {
-            const profile = await res.json();
+          const profile = await getUserProfile(session.user.id);
+          if (profile) {
             setBusinessId(profile.businessId);
           }
         } catch (e) {
