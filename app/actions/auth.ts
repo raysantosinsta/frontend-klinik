@@ -2,7 +2,8 @@
 
 export async function getUserProfile(userId: string) {
   try {
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
+    // Node 18+ fetch often resolves localhost to IPv6 ::1, causing ECONNREFUSED. Replace with 127.0.0.1.
+    const apiUrl = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001").replace("localhost", "127.0.0.1");
     const res = await fetch(`${apiUrl}/users/me/${userId}`, {
       cache: "no-store",
     });

@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/components/AuthProvider';
+import { uploadDocumentAction, listDocumentsAction, deleteDocumentAction } from '@/app/actions/documents';
 
 type DocumentItem = {
   id: string;
@@ -26,11 +27,8 @@ export default function NewDocumentPage() {
     if (!businessId) return;
     try {
       setIsLoadingDocs(true);
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/documents/${businessId}`);
-      if (res.ok) {
-        const data = await res.json();
-        setDocuments(data);
-      }
+      const data = await listDocumentsAction(businessId);
+      setDocuments(data);
     } catch (err) {
       console.error("Erro ao carregar documentos:", err);
     } finally {
@@ -42,10 +40,8 @@ export default function NewDocumentPage() {
     if (!window.confirm("Deseja realmente apagar este documento da base de conhecimento?")) return;
     
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/documents/${id}`, {
-        method: 'DELETE',
-      });
-      if (res.ok) {
+      const res = await deleteDocumentAction(id);
+      if (res.success) {
         setStatusMessage({ type: "success", text: "Documento excluído com sucesso." });
         await fetchDocuments();
         setTimeout(() => setStatusMessage({ type: "", text: "" }), 5000);
@@ -73,13 +69,10 @@ export default function NewDocumentPage() {
     formData.append('businessId', businessId);
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/documents/upload`, {
-        method: 'POST',
-        body: formData,
-      });
+      const res = await uploadDocumentAction(formData);
 
-      if (!response.ok) {
-        throw new Error('Rejeitado pelo processador de documentos.');
+      if (!res.success) {
+        throw new Error(res.error || 'Rejeitado pelo processador de documentos.');
       }
 
       setStatusMessage({ type: "success", text: "Vetorização concluída. Documento indexado na RAG." });
