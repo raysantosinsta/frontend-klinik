@@ -11,7 +11,7 @@ export default function DashboardPage() {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { businessId } = useAuth();
-  
+
   const [ownerPhone, setOwnerPhone] = useState("");
   const [savingPhone, setSavingPhone] = useState(false);
   const [statusMessage, setStatusMessage] = useState<{type: "success" | "error" | "", text: string}>({ type: "", text: "" });
@@ -43,7 +43,7 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (!businessId) return;
-    
+
     fetch(`${process.env.NEXT_PUBLIC_API_URL}/business/${businessId}`)
       .then(res => res.json())
       .then(data => {
@@ -60,10 +60,10 @@ export default function DashboardPage() {
 
   const handleSavePhone = async () => {
     if (!businessId) return;
-    
+
     setSavingPhone(true);
     setStatusMessage({ type: "", text: "" });
-    
+
     try {
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/business/${businessId}/ownerPhone`, {
         method: 'PATCH',
@@ -212,14 +212,14 @@ export default function DashboardPage() {
         </p>
 
         <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
-          <input 
-            type="text" 
+          <input
+            type="text"
             placeholder="Ex: 1-zbGz0DcnlCrrb4kLc9JYILc9Q5z2QkeWXxlU__WqGE ou URL completa"
             value={googleSheetsInput}
             onChange={(e) => setGoogleSheetsInput(e.target.value)}
             className="flex-1 h-12 px-4 bg-klinik-bg/50 border border-klinik-line focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all rounded-sm text-sm placeholder:text-klinik-muted/60 font-mono"
           />
-          <button 
+          <button
             onClick={handleSaveSheetId}
             disabled={savingSheet || !googleSheetsInput.trim()}
             className="h-12 px-6 bg-emerald-600 hover:bg-emerald-700 text-white font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed rounded-sm whitespace-nowrap text-sm shadow-sm"
@@ -227,7 +227,7 @@ export default function DashboardPage() {
             {savingSheet ? "Salvando..." : "Salvar Planilha"}
           </button>
           {googleSheetsId && (
-            <button 
+            <button
               onClick={handleClearSheetId}
               disabled={savingSheet}
               className="h-12 px-4 bg-white hover:bg-red-50 text-red-600 border border-red-200 hover:border-red-300 font-medium transition-colors rounded-sm text-sm"
@@ -257,16 +257,16 @@ export default function DashboardPage() {
         <p className="text-klinik-muted mb-8 max-w-2xl leading-relaxed text-sm">
           Forneça o número do WhatsApp administrativo (com DDI e DDD) para receber despachos em tempo real sempre que a inteligência artificial finalizar e confirmar um novo agendamento de paciente.
         </p>
-        
+
         <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-          <input 
-            type="text" 
+          <input
+            type="text"
             placeholder="Ex: 5511999999999"
             value={ownerPhone}
             onChange={(e) => setOwnerPhone(e.target.value)}
             className="w-full sm:w-80 h-12 px-4 bg-klinik-bg/50 border border-klinik-line focus:border-klinik-primary focus:ring-1 focus:ring-klinik-primary outline-none transition-all rounded-sm text-base placeholder:text-klinik-muted/60"
           />
-          <button 
+          <button
             onClick={handleSavePhone}
             disabled={savingPhone || !ownerPhone}
             className="h-12 px-6 bg-klinik-primary hover:bg-klinik-primary-hover text-klinik-surface font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed rounded-sm whitespace-nowrap"
@@ -290,7 +290,7 @@ export default function DashboardPage() {
             Conecte o número de WhatsApp da sua empresa para que os pacientes conversem diretamente com a IA autônoma.
           </p>
         </div>
-        <button 
+        <button
           onClick={() => router.push('/dashboard/whatsapp')}
           className="px-6 py-3 bg-klinik-text hover:bg-black text-white text-sm font-medium rounded-sm transition-colors whitespace-nowrap"
         >

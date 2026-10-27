@@ -131,7 +131,7 @@ export default function AppointmentsPage() {
         <div className="flex flex-col gap-3">
           {appointments.map((app) => (
             <div key={app.id} className="group bg-klinik-surface border border-klinik-line rounded-md p-5 flex flex-col md:flex-row md:items-center justify-between gap-6 hover:border-klinik-primary/30 transition-colors">
-              
+
               <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-8 flex-1">
                 <div className="min-w-[120px]">
                   <p className="text-xs font-semibold text-klinik-muted uppercase tracking-wider mb-1">Horário</p>
@@ -142,7 +142,7 @@ export default function AppointmentsPage() {
                     {new Date(app.date).toLocaleDateString()}
                   </p>
                 </div>
-                
+
                 <div className="flex-1">
                   <p className="text-xs font-semibold text-klinik-muted uppercase tracking-wider mb-1">Paciente</p>
                   <div className="flex items-center gap-2">
@@ -156,25 +156,25 @@ export default function AppointmentsPage() {
 
                 <div className="md:px-4">
                   <span className={`inline-flex items-center px-2.5 py-1 rounded-sm text-xs font-semibold border ${
-                    app.status === 'PENDING' ? 'bg-yellow-50 text-yellow-700 border-yellow-200' : 
-                    app.status === 'CONFIRMED' ? 'bg-klinik-whatsapp/10 text-klinik-whatsapp border-klinik-whatsapp/20' : 
+                    app.status === 'PENDING' ? 'bg-yellow-50 text-yellow-700 border-yellow-200' :
+                    app.status === 'CONFIRMED' ? 'bg-klinik-whatsapp/10 text-klinik-whatsapp border-klinik-whatsapp/20' :
                     'bg-red-50 text-red-700 border-red-200'
                   }`}>
                     {app.status === 'PENDING' ? 'Aguardando validação' : app.status === 'CONFIRMED' ? 'Reserva confirmada' : 'Reserva cancelada'}
                   </span>
                 </div>
               </div>
-              
+
               <div className="flex flex-wrap items-center gap-2 pt-4 md:pt-0 border-t md:border-t-0 border-klinik-line">
                 {app.status === 'PENDING' && (
                   <>
-                    <button 
+                    <button
                       onClick={() => changeStatus(app.id, 'CONFIRMED')}
                       className="px-4 py-2 bg-klinik-primary hover:bg-klinik-primary-hover text-white text-sm font-medium rounded-sm transition-colors"
                     >
                       Aprovar reserva
                     </button>
-                    <button 
+                    <button
                       onClick={() => changeStatus(app.id, 'CANCELLED')}
                       className="px-4 py-2 bg-white hover:bg-red-50 text-red-600 border border-red-200 hover:border-red-300 text-sm font-medium rounded-sm transition-colors"
                     >
@@ -183,7 +183,7 @@ export default function AppointmentsPage() {
                   </>
                 )}
                 {app.status !== 'PENDING' && (
-                  <button 
+                  <button
                     onClick={() => changeStatus(app.id, 'PENDING')}
                     className="px-4 py-2 bg-klinik-bg hover:bg-gray-200 text-klinik-text text-sm font-medium rounded-sm transition-colors"
                   >
