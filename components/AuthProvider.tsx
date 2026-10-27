@@ -35,7 +35,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         
         // Fetch businessId from backend via server action
         try {
-          const profile = await getUserProfile(session.user.id);
+          let profile = await getUserProfile(session.user.id);
+          if (!profile && session.user.email) {
+            // Auto-provisioning no banco local caso tenha sido recriado
+            const apiUrl = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001");
+            const regRes = await fetch(`${apiUrl}/users/register`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                id: session.user.id,
+                email: session.user.email,
+                name: session.user.user_metadata?.name || session.user.email.split('@')[0],
+                businessName: session.user.user_metadata?.businessName || "Clínica Klinik",
+              }),
+            });
+            if (regRes.ok) {
+              const regData = await regRes.json();
+              profile = { ...regData.user, business: regData.business };
+            }
+          }
           if (profile) {
             setBusinessId(profile.businessId);
           }
@@ -58,7 +76,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (session?.user) {
         setUser(session.user);
         try {
-          const profile = await getUserProfile(session.user.id);
+          let profile = await getUserProfile(session.user.id);
+          if (!profile && session.user.email) {
+            const apiUrl = (process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001");
+            const regRes = await fetch(`${apiUrl}/users/register`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                id: session.user.id,
+                email: session.user.email,
+                name: session.user.user_metadata?.name || session.user.email.split('@')[0],
+                businessName: session.user.user_metadata?.businessName || "Clínica Klinik",
+              }),
+            });
+            if (regRes.ok) {
+              const regData = await regRes.json();
+              profile = { ...regData.user, business: regData.business };
+            }
+          }
           if (profile) {
             setBusinessId(profile.businessId);
           }

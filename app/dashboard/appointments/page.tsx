@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useAuth } from "@/components/AuthProvider";
 
 type Appointment = {
@@ -19,11 +20,13 @@ type Appointment = {
 export default function AppointmentsPage() {
   const { businessId } = useAuth();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [googleSheetsId, setGoogleSheetsId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (!businessId) return;
 
+    // Carrega os agendamentos
     fetch(`${process.env.NEXT_PUBLIC_API_URL}/appointments/${businessId}`)
       .then((res) => res.json())
       .then((data) => {
@@ -34,6 +37,16 @@ export default function AppointmentsPage() {
         console.error("Erro ao carregar agendamentos:", err);
         setIsLoading(false);
       });
+
+    // Carrega dados da empresa para obter o googleSheetsId
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/business/${businessId}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.googleSheetsId) {
+          setGoogleSheetsId(data.googleSheetsId);
+        }
+      })
+      .catch((err) => console.error("Erro ao carregar dados do negócio:", err));
   }, [businessId]);
 
   const changeStatus = async (id: string, newStatus: string) => {
@@ -73,8 +86,34 @@ export default function AppointmentsPage() {
             Registros processados e triados pelo agente de IA.
           </p>
         </div>
-        <div className="text-sm text-klinik-muted">
-          Total de registros: <span className="font-medium text-klinik-text">{appointments.length}</span>
+        <div className="flex items-center gap-3">
+          {googleSheetsId ? (
+            <a
+              href={`https://docs.google.com/spreadsheets/d/${googleSheetsId}/edit`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-3.5 py-2 text-xs font-medium text-emerald-700 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-md transition-colors shadow-sm"
+            >
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                <polyline points="14 2 14 8 20 8"></polyline>
+                <line x1="8" y1="13" x2="16" y2="13"></line>
+                <line x1="8" y1="17" x2="16" y2="17"></line>
+                <polyline points="10 9 9 9 8 9"></polyline>
+              </svg>
+              Abrir no Google Sheets ↗
+            </a>
+          ) : (
+            <Link
+              href="/dashboard#sheets"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-klinik-muted hover:text-emerald-700 hover:bg-emerald-50 border border-dashed border-klinik-line hover:border-emerald-300 rounded-md transition-colors"
+            >
+              + Vincular Planilha
+            </Link>
+          )}
+          <div className="text-sm text-klinik-muted pl-2 border-l border-klinik-line">
+            Total: <span className="font-semibold text-klinik-text">{appointments.length}</span>
+          </div>
         </div>
       </header>
 

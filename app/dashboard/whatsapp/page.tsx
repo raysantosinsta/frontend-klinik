@@ -15,7 +15,12 @@ export default function WhatsAppSettingsPage() {
   const [statusMessage, setStatusMessage] = useState<{type: "success" | "error" | "", text: string}>({ type: "", text: "" });
 
   const fetchStatus = async () => {
-    if (!businessId) return;
+    if (!businessId) {
+      if (!isAuthLoading) {
+        setIsLoading(false);
+      }
+      return;
+    }
     try {
       // Background poll não deve bloquear a interface
       const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/whatsapp/status/${businessId}`);
@@ -24,6 +29,8 @@ export default function WhatsAppSettingsPage() {
         setIsConnected(data.connected);
         setStatus(data.connected ? 'Operacional' : (data.status || 'Offline'));
         if (data.connected) setQrCode(null);
+      } else {
+        setStatus('Offline');
       }
     } catch (err) {
       console.error(err);
@@ -36,14 +43,38 @@ export default function WhatsAppSettingsPage() {
   useEffect(() => {
     if (businessId) {
       fetchStatus();
+    } else if (!isAuthLoading) {
+      setIsLoading(false);
     }
     const interval = setInterval(() => {
       if (!isConnected && businessId) fetchStatus();
     }, 5000);
     return () => clearInterval(interval);
-  }, [isConnected, businessId]);
+  }, [isConnected, businessId, isAuthLoading]);
+
+  // Atualiza o QR Code automaticamente a cada 12 segundos para nunca expirar
+  useEffect(() => {
+    if (!qrCode || isConnected || !businessId) return;
+
+    const qrInterval = setInterval(() => {
+      fetch(`${process.env.NEXT_PUBLIC_API_URL}/whatsapp/connect/${businessId}`, { method: 'POST' })
+        .then(res => res.json())
+        .then(data => {
+          if (data?.qrcode) {
+            setQrCode(data.qrcode.startsWith('data:') ? data.qrcode : `data:image/png;base64,${data.qrcode}`);
+          }
+        })
+        .catch(() => {});
+    }, 12000);
+
+    return () => clearInterval(qrInterval);
+  }, [qrCode, isConnected, businessId]);
 
   const handleConnect = async () => {
+    if (!businessId) {
+      setStatusMessage({ type: "error", text: "Aguardando identificação da clínica no banco de dados. Recarregue a página." });
+      return;
+    }
     try {
       setIsActionLoading(true);
       setStatusMessage({ type: "", text: "" });
@@ -62,6 +93,35 @@ export default function WhatsAppSettingsPage() {
     } catch (err) {
       console.error(err);
       setStatusMessage({ type: "error", text: "Falha na rede ao tentar contactar a Evolution API." });
+    } finally {
+      setIsActionLoading(false);
+    }
+  };
+
+  const handleRestartSession = async () => {
+    if (!businessId) return;
+    setIsActionLoading(true);
+    setStatusMessage({ type: "", text: "" });
+    try {
+      // 1. Limpa qualquer sessão travada
+      await fetch(`${process.env.NEXT_PUBLIC_API_URL}/whatsapp/disconnect/${businessId}`, {
+        method: 'DELETE',
+      });
+      // 2. Cria do zero com QR Code novo
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/whatsapp/connect/${businessId}`, {
+        method: 'POST',
+      });
+      if (res.ok) {
+        const data = await res.json();
+        if (data.qrcode) {
+          setQrCode(data.qrcode.startsWith('data:') ? data.qrcode : `data:image/png;base64,${data.qrcode}`);
+          setStatus('Aguardando sincronização');
+          setStatusMessage({ type: "success", text: "Sessão reiniciada! Novo QR Code gerado. Escaneie agora." });
+        }
+      }
+    } catch (err) {
+      console.error(err);
+      setStatusMessage({ type: "error", text: "Falha ao reiniciar sessão." });
     } finally {
       setIsActionLoading(false);
     }
@@ -150,16 +210,39 @@ export default function WhatsAppSettingsPage() {
             <h3 className="text-xl font-medium text-klinik-text mb-6">Autenticação exigida</h3>
             
             <div className="flex flex-col md:flex-row items-center gap-10">
-              <div className="bg-white p-3 rounded-xl border border-klinik-line shadow-sm">
-                <div className="relative w-64 h-64">
-                  <Image
-                    src={qrCode}
-                    alt="QR Code de autenticação"
-                    fill
-                    className="object-contain"
-                    unoptimized
-                  />
+              <div className="flex flex-col items-center gap-3">
+                <div className="bg-white p-3 rounded-xl border border-klinik-line shadow-sm">
+                  <div className="relative w-64 h-64">
+                    <Image
+                      src={qrCode}
+                      alt="QR Code de autenticação"
+                      fill
+                      className="object-contain"
+                      unoptimized
+                    />
+                  </div>
                 </div>
+
+                <div className="flex items-center gap-3 mt-1">
+                  <button
+                    onClick={handleConnect}
+                    disabled={isActionLoading}
+                    className="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 rounded text-xs font-medium flex items-center gap-1.5 transition-colors disabled:opacity-50"
+                  >
+                    <span>🔄 Atualizar QR Code</span>
+                  </button>
+                  <button
+                    onClick={handleRestartSession}
+                    disabled={isActionLoading}
+                    className="px-3 py-1.5 bg-white hover:bg-red-50 text-red-600 border border-red-200 hover:border-red-300 rounded text-xs font-medium flex items-center gap-1.5 transition-colors disabled:opacity-50"
+                  >
+                    <span>⚡ Gerar do Zero</span>
+                  </button>
+                </div>
+                <span className="text-[11px] text-klinik-muted flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                  Auto-atualizando a cada 12s para nunca expirar
+                </span>
               </div>
               
               <div className="max-w-sm">
